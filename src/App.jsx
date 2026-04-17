@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import io from 'socket.io-client';
 import Header from './components/Header';
-import Filters from './components/Filters';
 import FeaturedNews from './components/FeaturedNews';
 import NewsCard from './components/NewsCard';
 import Pagination from './components/Pagination';
@@ -128,9 +127,9 @@ const App = () => {
   
   return (
     <div className="App">
-      <Header isConnected={isConnected} newsCount={totalItems} />
-      
-      <Filters
+      <Header 
+        isConnected={isConnected} 
+        newsCount={totalItems}
         categories={categories}
         selectedCategory={selectedCategory}
         sortBy={sortBy}
@@ -138,54 +137,56 @@ const App = () => {
         onSortChange={handleSortChange}
       />
       
-      <main className="container">
-        {loading ? (
-          <div className="loading">
-            <div className="spinner"></div>
-            <p>加载中...</p>
-          </div>
-        ) : (
-          <>
-            {featuredArticle && (
-              <FeaturedNews 
-                article={featuredArticle} 
-                onClick={handleArticleClick}
+      <main className="main-content">
+        <div className="content-container">
+          {loading ? (
+            <div className="loading">
+              <div className="spinner"></div>
+              <p>加载中...</p>
+            </div>
+          ) : (
+            <>
+              {featuredArticle && (
+                <FeaturedNews 
+                  article={featuredArticle} 
+                  onClick={handleArticleClick}
+                />
+              )}
+              
+              {displayNews.length > 0 ? (
+                <div className="news-grid">
+                  {displayNews.map(article => (
+                    <NewsCard
+                      key={article.id}
+                      article={article}
+                      isNew={newArticleIds.has(article.id)}
+                      onClick={handleArticleClick}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="no-news">
+                  <h3>暂无新闻</h3>
+                  <p>当前分类下暂无新闻内容，请尝试其他分类。</p>
+                </div>
+              )}
+              
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                onPageChange={handlePageChange}
               />
-            )}
-            
-            {displayNews.length > 0 ? (
-              <div className="news-grid">
-                {displayNews.map(article => (
-                  <NewsCard
-                    key={article.id}
-                    article={article}
-                    isNew={newArticleIds.has(article.id)}
-                    onClick={handleArticleClick}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="no-news">
-                <h3>暂无新闻</h3>
-                <p>当前分类下暂无新闻内容，请尝试其他分类。</p>
-              </div>
-            )}
-            
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
+            </>
+          )}
+        </div>
       </main>
       
       <footer className="footer">
-        <div className="container">
-          <p>© 2024 实时新闻门户 - 具备实时更新、模块化文章布局和动态排序选项</p>
-          <p style={{ marginTop: '10px', fontSize: '0.9rem' }}>
-            使用 React + Express + Socket.io 构建 | 支持 Docker 部署
+        <div className="footer-container">
+          <p>© 2024 实时新闻门户</p>
+          <p className="footer-subtitle">
+            使用 React + Express + Socket.io 构建
           </p>
         </div>
       </footer>
